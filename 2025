@@ -1,4 +1,4 @@
--- grow a garden egg esp + pet replace (only night egg) + RGB jackpot raccoon 🎉
+-- AdrianHub 🥚 Egg ESP + Pet Replace (Visual Only) + RGG Jackpot Effect 🎉
 
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -6,23 +6,30 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- 🥚 supported egg esp list
-local EggNames = {
-	["Common Egg"] = true,
-	["Mythical Egg"] = true,
-	["Bug Egg"] = true,
-	["Common Summer Egg"] = true,
-	["Rare Summer Egg"] = true,
-	["Paradise Egg"] = true,
-	["Bee Egg"] = true,
-	["Oasis Egg"] = true,
-	["Anti Bee Egg"] = true,
-	["Night Egg"] = true
+-- 🐾 Full Pet List per Egg
+local PetLists = {
+	["Common Egg"] = { "Dog", "Golden Lab", "Bunny" },
+	["Mythical Egg"] = { "Grey Mouse", "Brown Mouse", "Squirrel", "Red Giant Ant", "Red Fox" },
+	["Bug Egg"] = { "Caterpillar", "Snail", "Giant Ant", "Praying Mantis", "Dragonfly" },
+	["Common Summer Egg"] = { "Starfish", "Seagull", "Crab" },
+	["Rare Summer Egg"] = { "Flamingo", "Toucan", "Sea Turtle", "Orangutan", "Seal" },
+	["Paradise Egg"] = { "Ostrich", "Peacock", "Capybara", "Scarlet Macaw", "Mimic Octopus" },
+	["Bee Egg"] = { "Bee", "Honey Bee", "Bear Bee", "Petal Bee", "Queen Bee" },
+	["Oasis Egg"] = { "Meerkat", "Sand Snake", "Axolotl", "Hyacinth Macaw", "Fennec Fox" },
+	["Anti Bee Egg"] = { "Wasp", "Tarantula Hawk", "Moth", "Butterfly", "Disco Bee" },
+	["Night Egg"] = { "Frog", "Mole", "Hedgehog", "Raccoon", "Night Owl", "Echo Frog" }
 }
 
--- 🐾 pets (only for Night Egg)
-local PetList = {
-	"Frog", "Mole", "Hedgehog", "Raccoon", "Night Owl", "Echo Frog"
+-- 💎 Pets with RGG Jackpot Effect
+local rggJackpotPets = {
+	["Raccoon"] = true,
+	["Red Fox"] = true,
+	["Dragonfly"] = true,
+	["Mimic Octopus"] = true,
+	["Queen Bee"] = true,
+	["Fennec Fox"] = true,
+	["Butterfly"] = true,
+	["Disco Bee"] = true
 }
 
 local cooldownTime = 30
@@ -32,12 +39,11 @@ local systemRunning = false
 local gui = nil
 local timerLabel
 
--- get random pet
-local function getRandomPet()
-	return PetList[math.random(1, #PetList)]
+local function getRandomPet(list)
+	return list[math.random(1, #list)]
 end
 
--- ESP tag
+-- Tag eggs with Billboard
 local function tagEgg(part, eggName)
 	if part:FindFirstChild("EggLabel") then return end
 
@@ -57,7 +63,7 @@ local function tagEgg(part, eggName)
 	eggText.Font = Enum.Font.GothamBold
 	eggText.Text = eggName
 
-	if eggName == "Night Egg" then
+	if PetLists[eggName] then
 		local petText = Instance.new("TextLabel", bb)
 		petText.Name = "PetLabel"
 		petText.Size = UDim2.new(1, 0, 0.33, 0)
@@ -66,31 +72,44 @@ local function tagEgg(part, eggName)
 		petText.TextScaled = true
 		petText.TextColor3 = Color3.fromRGB(0, 255, 255)
 		petText.Font = Enum.Font.GothamBold
-		petText.Text = getRandomPet()
 
-		local cooldownText = Instance.new("TextLabel", bb)
-		cooldownText.Name = "CooldownLabel"
-		cooldownText.Size = UDim2.new(1, 0, 0.33, 0)
-		cooldownText.Position = UDim2.new(0, 0, 0.66, 0)
-		cooldownText.BackgroundTransparency = 1
-		cooldownText.TextScaled = true
-		cooldownText.TextColor3 = Color3.fromRGB(255, 100, 100)
-		cooldownText.Font = Enum.Font.GothamBold
-		cooldownText.Text = "READY"
+		local petName = getRandomPet(PetLists[eggName])
+		petText.Text = petName
+
+		if rggJackpotPets[petName] then
+			task.spawn(function()
+				while petText and petText.Parent do
+					petText.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+					task.wait(0.05)
+				end
+			end)
+		end
+
+		if eggName == "Night Egg" then
+			local cooldownText = Instance.new("TextLabel", bb)
+			cooldownText.Name = "CooldownLabel"
+			cooldownText.Size = UDim2.new(1, 0, 0.33, 0)
+			cooldownText.Position = UDim2.new(0, 0, 0.66, 0)
+			cooldownText.BackgroundTransparency = 1
+			cooldownText.TextScaled = true
+			cooldownText.TextColor3 = Color3.fromRGB(255, 100, 100)
+			cooldownText.Font = Enum.Font.GothamBold
+			cooldownText.Text = "READY"
+		end
 	end
 end
 
--- scan for eggs
+-- Scan all eggs in workspace
 local function scanEggs()
 	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if EggNames[obj.Name] then
-			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or (obj:IsA("BasePart") and obj)
+		if PetLists[obj.Name] then
+			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
 			if part then tagEgg(part, obj.Name) end
 		end
 	end
 end
 
--- jackpot notification
+-- Raccoon Jackpot Notify
 local function jackpotNotify()
 	local label = Instance.new("TextLabel")
 	label.Size = UDim2.new(0, 300, 0, 50)
@@ -108,19 +127,19 @@ local function jackpotNotify()
 	end)
 end
 
--- shuffle pets in Night Egg only
+-- Replace Pet on Night Egg (visual only)
 local function startCooldown(button, timerLabel)
 	if shuffleCooldown then return end
 	shuffleCooldown = true
 	currentCountdown = cooldownTime
 
 	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if EggNames[obj.Name] then
-			local mainPart = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
-			if mainPart and obj.Name == "Night Egg" then
-				local gui = mainPart:FindFirstChild("EggLabel")
+		if obj.Name == "Night Egg" then
+			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
+			if part then
+				local gui = part:FindFirstChild("EggLabel")
 				if gui and gui:FindFirstChild("PetLabel") and gui:FindFirstChild("CooldownLabel") then
-					local newPet = getRandomPet()
+					local newPet = getRandomPet(PetLists["Night Egg"])
 					gui.PetLabel.Text = newPet
 					gui.CooldownLabel.Text = "WAIT 30s"
 
@@ -143,9 +162,9 @@ local function startCooldown(button, timerLabel)
 	while currentCountdown > 0 do
 		timerLabel.Text = "⏳ Wait " .. currentCountdown .. " seconds to change the pet inside the egg"
 		for _, obj in ipairs(Workspace:GetDescendants()) do
-			if EggNames[obj.Name] then
+			if obj.Name == "Night Egg" then
 				local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
-				if part and obj.Name == "Night Egg" then
+				if part then
 					local gui = part:FindFirstChild("EggLabel")
 					if gui and gui:FindFirstChild("CooldownLabel") then
 						gui.CooldownLabel.Text = "WAIT " .. currentCountdown .. "s"
@@ -160,9 +179,9 @@ local function startCooldown(button, timerLabel)
 	shuffleCooldown = false
 	timerLabel.Text = "✅ You can now change the pet inside the egg"
 	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if EggNames[obj.Name] then
+		if obj.Name == "Night Egg" then
 			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
-			if part and obj.Name == "Night Egg" then
+			if part then
 				local gui = part:FindFirstChild("EggLabel")
 				if gui and gui:FindFirstChild("CooldownLabel") then
 					gui.CooldownLabel.Text = "READY"
@@ -172,7 +191,7 @@ local function startCooldown(button, timerLabel)
 	end
 end
 
--- create GUI
+-- GUI Elements
 local function createUI()
 	gui = Instance.new("ScreenGui", PlayerGui)
 	gui.Name = "PetReplaceUI"
@@ -195,7 +214,6 @@ local function createUI()
 	button.Font = Enum.Font.GothamBold
 	button.TextSize = 16
 	button.Text = "🔁 Replace Pet Inside Egg"
-
 	Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
 	Instance.new("UICorner", timerLabel).CornerRadius = UDim.new(0, 8)
 
@@ -204,7 +222,7 @@ local function createUI()
 	end)
 end
 
--- toggle button GUI (Pet Detector🔍)
+-- Toggle Button GUI
 local toggleGui = Instance.new("ScreenGui", PlayerGui)
 toggleGui.Name = "PetDetectorToggle"
 
