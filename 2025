@@ -30,7 +30,8 @@ local rggJackpotPets = {
 	["Queen Bee"] = true,
 	["Fennec Fox"] = true,
 	["Butterfly"] = true,
-	["Disco Bee"] = true
+	["Disco Bee"] = true,
+        ["T-Rex"] = true
 }
 
 local cooldownTime = 30
