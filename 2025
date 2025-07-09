@@ -17,7 +17,8 @@ local PetLists = {
 	["Bee Egg"] = { "Bee", "Honey Bee", "Bear Bee", "Petal Bee", "Queen Bee" },
 	["Oasis Egg"] = { "Meerkat", "Sand Snake", "Axolotl", "Hyacinth Macaw", "Fennec Fox" },
 	["Anti Bee Egg"] = { "Wasp", "Tarantula Hawk", "Moth", "Butterfly", "Disco Bee" },
-	["Night Egg"] = { "Frog", "Mole", "Hedgehog", "Raccoon", "Night Owl", "Echo Frog" }
+	["Night Egg"] = { "Frog", "Mole", "Hedgehog", "Raccoon", "Night Owl", "Echo Frog" },
+        ["Dinosaur Egg"] = { "Raptor", "Triceratops", "Stegosaurus", "Pterodactyl", "Brontosaurus", "T-Rex" }
 }
 
 -- 💎 Pets with RGG Jackpot Effect
