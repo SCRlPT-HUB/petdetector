@@ -18,7 +18,7 @@ local PetLists = {
 	["Oasis Egg"] = { "Meerkat", "Sand Snake", "Axolotl", "Hyacinth Macaw", "Fennec Fox" },
 	["Anti Bee Egg"] = { "Wasp", "Tarantula Hawk", "Moth", "Butterfly", "Disco Bee" },
 	["Night Egg"] = { "Frog", "Mole", "Hedgehog", "Raccoon", "Night Owl", "Echo Frog" },
-        ["Dinosaur Egg"] = { "Raptor", "Triceratops", "Stegosaurus", "Pterodactyl", "Brontosaurus", "T-Rex" }
+	["Dinosaur Egg"] = { "Raptor", "Triceratops", "Stegosaurus", "Pterodactyl", "Brontosaurus", "T-Rex" }
 }
 
 -- 💎 Pets with RGG Jackpot Effect
@@ -31,7 +31,7 @@ local rggJackpotPets = {
 	["Fennec Fox"] = true,
 	["Butterfly"] = true,
 	["Disco Bee"] = true,
-        ["T-Rex"] = true
+	["T-Rex"] = true
 }
 
 local cooldownTime = 30
@@ -74,39 +74,18 @@ local function tagEgg(part, eggName)
 		petText.TextScaled = true
 		petText.TextColor3 = Color3.fromRGB(0, 255, 255)
 		petText.Font = Enum.Font.GothamBold
-
-		local petName = getRandomPet(PetLists[eggName])
-		petText.Text = petName
-
-		if rggJackpotPets[petName] then
-			task.spawn(function()
-				while petText and petText.Parent do
-					petText.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-					task.wait(0.05)
-				end
-			end)
-		end
-
-		if eggName == "Night Egg" then
-			local cooldownText = Instance.new("TextLabel", bb)
-			cooldownText.Name = "CooldownLabel"
-			cooldownText.Size = UDim2.new(1, 0, 0.33, 0)
-			cooldownText.Position = UDim2.new(0, 0, 0.66, 0)
-			cooldownText.BackgroundTransparency = 1
-			cooldownText.TextScaled = true
-			cooldownText.TextColor3 = Color3.fromRGB(255, 100, 100)
-			cooldownText.Font = Enum.Font.GothamBold
-			cooldownText.Text = "READY"
-		end
+		petText.Text = getRandomPet(PetLists[eggName])
 	end
 end
 
--- Scan all eggs in workspace
+-- Scan all eggs once
 local function scanEggs()
 	for _, obj in ipairs(Workspace:GetDescendants()) do
 		if PetLists[obj.Name] then
 			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
-			if part then tagEgg(part, obj.Name) end
+			if part then
+				tagEgg(part, obj.Name)
+			end
 		end
 	end
 end
@@ -129,33 +108,45 @@ local function jackpotNotify()
 	end)
 end
 
--- Replace Pet on Night Egg (visual only)
+-- Replace pets in all eggs (visual only) + cooldown
 local function startCooldown(button, timerLabel)
 	if shuffleCooldown then return end
 	shuffleCooldown = true
 	currentCountdown = cooldownTime
 
 	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if obj.Name == "Night Egg" then
+		if PetLists[obj.Name] then
 			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
 			if part then
 				local gui = part:FindFirstChild("EggLabel")
-				if gui and gui:FindFirstChild("PetLabel") and gui:FindFirstChild("CooldownLabel") then
-					local newPet = getRandomPet(PetLists["Night Egg"])
+				if gui and gui:FindFirstChild("PetLabel") then
+					local newPet = getRandomPet(PetLists[obj.Name])
 					gui.PetLabel.Text = newPet
-					gui.CooldownLabel.Text = "WAIT 30s"
 
-					if newPet == "Raccoon" then
+					if rggJackpotPets[newPet] then
 						task.spawn(function()
-							while gui and gui:FindFirstChild("PetLabel") do
+							while gui and gui:FindFirstChild("PetLabel") and shuffleCooldown do
 								gui.PetLabel.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-								task.wait(0.1)
+								task.wait(0.05)
 							end
 						end)
 						jackpotNotify()
 					else
 						gui.PetLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
 					end
+
+					local cooldownLabel = gui:FindFirstChild("CooldownLabel")
+					if not cooldownLabel then
+						cooldownLabel = Instance.new("TextLabel", gui)
+						cooldownLabel.Name = "CooldownLabel"
+						cooldownLabel.Size = UDim2.new(1, 0, 0.33, 0)
+						cooldownLabel.Position = UDim2.new(0, 0, 0.66, 0)
+						cooldownLabel.BackgroundTransparency = 1
+						cooldownLabel.TextScaled = true
+						cooldownLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+						cooldownLabel.Font = Enum.Font.GothamBold
+					end
+					cooldownLabel.Text = "WAIT 30s"
 				end
 			end
 		end
@@ -164,7 +155,7 @@ local function startCooldown(button, timerLabel)
 	while currentCountdown > 0 do
 		timerLabel.Text = "⏳ Wait " .. currentCountdown .. " seconds to change the pet inside the egg"
 		for _, obj in ipairs(Workspace:GetDescendants()) do
-			if obj.Name == "Night Egg" then
+			if PetLists[obj.Name] then
 				local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
 				if part then
 					local gui = part:FindFirstChild("EggLabel")
@@ -181,7 +172,7 @@ local function startCooldown(button, timerLabel)
 	shuffleCooldown = false
 	timerLabel.Text = "✅ You can now change the pet inside the egg"
 	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if obj.Name == "Night Egg" then
+		if PetLists[obj.Name] then
 			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
 			if part then
 				local gui = part:FindFirstChild("EggLabel")
@@ -207,6 +198,7 @@ local function createUI()
 	timerLabel.TextScaled = true
 	timerLabel.Text = "✅ You can now change the pet inside the egg"
 	timerLabel.Parent = gui
+	Instance.new("UICorner", timerLabel).CornerRadius = UDim.new(0, 8)
 
 	local button = Instance.new("TextButton", gui)
 	button.Size = UDim2.new(0, 250, 0, 40)
@@ -217,7 +209,6 @@ local function createUI()
 	button.TextSize = 16
 	button.Text = "🔁 Replace Pet Inside Egg"
 	Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
-	Instance.new("UICorner", timerLabel).CornerRadius = UDim.new(0, 8)
 
 	button.MouseButton1Click:Connect(function()
 		startCooldown(button, timerLabel)
