@@ -18,7 +18,8 @@ local PetLists = {
 	["Oasis Egg"] = { "Meerkat", "Sand Snake", "Axolotl", "Hyacinth Macaw", "Fennec Fox" },
 	["Anti Bee Egg"] = { "Wasp", "Tarantula Hawk", "Moth", "Butterfly", "Disco Bee" },
 	["Night Egg"] = { "Frog", "Mole", "Hedgehog", "Raccoon", "Night Owl", "Echo Frog" },
-	["Dinosaur Egg"] = { "Raptor", "Triceratops", "Stegosaurus", "Pterodactyl", "Brontosaurus", "T-Rex" }
+	["Dinosaur Egg"] = { "Raptor", "Triceratops", "Stegosaurus", "Pterodactyl", "Brontosaurus", "T-Rex" },
+        ["Zen Egg"] = { "Shiba Inu", "Nihonzaru", "Tanuki", "Tanchozuru", "Kappa", "Kitsune" }
 }
 
 -- 💎 Pets with RGG Jackpot Effect
@@ -31,7 +32,8 @@ local rggJackpotPets = {
 	["Fennec Fox"] = true,
 	["Butterfly"] = true,
 	["Disco Bee"] = true,
-	["T-Rex"] = true
+	["T-Rex"] = true,
+        ["Kitsune"] = true
 }
 
 local cooldownTime = 30
