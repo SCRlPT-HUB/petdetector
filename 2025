@@ -19,7 +19,7 @@ local PetLists = {
 	["Anti Bee Egg"] = { "Wasp", "Tarantula Hawk", "Moth", "Butterfly", "Disco Bee" },
 	["Night Egg"] = { "Frog", "Mole", "Hedgehog", "Raccoon", "Night Owl", "Echo Frog" },
 	["Dinosaur Egg"] = { "Raptor", "Triceratops", "Stegosaurus", "Pterodactyl", "Brontosaurus", "T-Rex" },
-        ["Zen Egg"] = { "Shiba Inu", "Nihonzaru", "Tanuki", "Tanchozuru", "Kappa", "Kitsune" }
+	["Zen Egg"] = { "Shiba Inu", "Nihonzaru", "Tanuki", "Tanchozuru", "Kappa", "Kitsune" }
 }
 
 -- 💎 Pets with RGG Jackpot Effect
@@ -33,7 +33,7 @@ local rggJackpotPets = {
 	["Butterfly"] = true,
 	["Disco Bee"] = true,
 	["T-Rex"] = true,
-        ["Kitsune"] = true
+	["Kitsune"] = true
 }
 
 local cooldownTime = 30
@@ -80,11 +80,11 @@ local function tagEgg(part, eggName)
 	end
 end
 
--- Scan all eggs once
+-- ✅ Fixed: Only scan egg models once
 local function scanEggs()
 	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if PetLists[obj.Name] then
-			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
+		if obj:IsA("Model") and PetLists[obj.Name] then
+			local part = obj:FindFirstChildWhichIsA("BasePart")
 			if part then
 				tagEgg(part, obj.Name)
 			end
@@ -111,14 +111,14 @@ local function jackpotNotify()
 end
 
 -- Replace pets in all eggs (visual only) + cooldown
-local function startCooldown(button, timerLabel)
+local function startCooldown(button, timer)
 	if shuffleCooldown then return end
 	shuffleCooldown = true
 	currentCountdown = cooldownTime
 
 	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if PetLists[obj.Name] then
-			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
+		if obj:IsA("Model") and PetLists[obj.Name] then
+			local part = obj:FindFirstChildWhichIsA("BasePart")
 			if part then
 				local gui = part:FindFirstChild("EggLabel")
 				if gui and gui:FindFirstChild("PetLabel") then
@@ -155,10 +155,10 @@ local function startCooldown(button, timerLabel)
 	end
 
 	while currentCountdown > 0 do
-		timerLabel.Text = "⏳ Wait " .. currentCountdown .. " seconds to change the pet inside the egg"
+		timer.Text = "⏳ Wait " .. currentCountdown .. " seconds to change the pet inside the egg"
 		for _, obj in ipairs(Workspace:GetDescendants()) do
-			if PetLists[obj.Name] then
-				local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
+			if obj:IsA("Model") and PetLists[obj.Name] then
+				local part = obj:FindFirstChildWhichIsA("BasePart")
 				if part then
 					local gui = part:FindFirstChild("EggLabel")
 					if gui and gui:FindFirstChild("CooldownLabel") then
@@ -172,10 +172,10 @@ local function startCooldown(button, timerLabel)
 	end
 
 	shuffleCooldown = false
-	timerLabel.Text = "✅ You can now change the pet inside the egg"
+	timer.Text = "✅ You can now change the pet inside the egg"
 	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if PetLists[obj.Name] then
-			local part = obj:IsA("Model") and obj:FindFirstChildWhichIsA("BasePart") or obj
+		if obj:IsA("Model") and PetLists[obj.Name] then
+			local part = obj:FindFirstChildWhichIsA("BasePart")
 			if part then
 				local gui = part:FindFirstChild("EggLabel")
 				if gui and gui:FindFirstChild("CooldownLabel") then
